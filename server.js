@@ -10,34 +10,29 @@ const app = express();
 // Ensure uploads folder exists
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
+// Request logging for debugging on Render
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} | ${req.method} ${req.url}`);
+  next();
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-
-// Serve uploaded CVs
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API Routes
 app.use('/api/register', require('./routes/register'));
 app.use('/api/track',    require('./routes/track'));
 app.use('/api/admin',    require('./routes/admin'));
 
-// Serve frontend static files
-const staticFiles = [
-  'index.html', 'admin.html',
-  'style.css', 'admin.css',
-  'script.js', 'admin.js', 'config.js'
-];
+// Serve uploaded CVs
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-staticFiles.forEach(file => {
-  app.get(`/${file}`, (req, res) => {
-    res.sendFile(path.join(__dirname, file));
-  });
-});
+// Serve frontend static files robustly
+app.use(express.static(path.join(__dirname, './')));
 
-// Serve main frontend pages
+// Serve main frontend pages explicitly for cleaner URLs
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -51,16 +46,28 @@ app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'API endpoint not found' });
 });
 
-// Redirect any other unknown routes to index.html
+// Catch-all: Redirect any other unknown routes to index.html
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  if (req.accepts('html')) {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  } else {
+    res.status(404).json({ error: 'Not found' });
+  }
 });
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err);
+  res.status(500).json({ error: 'Internal server error', details: err.message });
+});
+
 // Connect MongoDB then start server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅  MongoDB connected');
-    app.listen(process.env.PORT || 3000, () => {
-      console.log(`🚀  Server running → http://localhost:${process.env.PORT || 3000}`);
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`🚀  Server running → http://localhost:${PORT}`);
       console.log(`📋  Batch size     → ${process.env.BATCH_SIZE || 20} applicants per batch`);
     });
   })
