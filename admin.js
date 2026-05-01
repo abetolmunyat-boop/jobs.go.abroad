@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('loginPassword').value;
 
     try {
-      const res = await fetch(API_BASE_URL + '/api/admin/login', {
+      const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchApplicants() {
     try {
-      const res = await fetch(API_BASE_URL + '/api/track/applicants', {
+      const res = await fetch('/api/track/applicants', {
         headers: getAuthHeaders()
       });
       
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const cvLink = document.getElementById('modalCV');
     if (currentApplicant.cvFile) {
-      cvLink.href = `${API_BASE_URL}/${currentApplicant.cvFile.replace(/\\/g, '/')}`; // handle windows paths if any
+      cvLink.href = `/${currentApplicant.cvFile.replace(/\\/g, '/')}`; // handle windows paths if any
       cvLink.style.display = 'inline-block';
     } else {
       cvLink.style.display = 'none';
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!currentApplicant) return;
 
     try {
-      const res = await fetch(API_BASE_URL + '/api/track/update', {
+      const res = await fetch('/api/track/update', {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({

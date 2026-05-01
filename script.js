@@ -88,7 +88,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
     const cvInput = document.getElementById('cvFile');
     if (cvInput.files[0]) formData.append('cvFile', cvInput.files[0]);
 
-    const res  = await fetch(API_BASE_URL + '/api/register', { method: 'POST', body: formData });
+    const res  = await fetch('/api/register', { method: 'POST', body: formData });
     const data = await res.json();
 
     if (!res.ok) { alert(data.error || 'Registration failed.'); return; }
@@ -144,7 +144,7 @@ async function trackApplication() {
   cardEl.classList.remove('show');
 
   try {
-    const res  = await fetch(API_BASE_URL + '/api/track', {
+    const res  = await fetch('/api/track', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ ref, email })
