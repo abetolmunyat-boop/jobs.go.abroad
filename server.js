@@ -22,6 +22,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API Routes
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    env: {
+      has_mongo: !!process.env.MONGO_URI,
+      has_jwt: !!process.env.JWT_SECRET,
+      has_admin_email: !!process.env.ADMIN_EMAIL,
+      port: process.env.PORT || 3000
+    }
+  });
+});
+
 app.use('/api/register', require('./routes/register'));
 app.use('/api/track',    require('./routes/track'));
 app.use('/api/admin',    require('./routes/admin'));
