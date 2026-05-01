@@ -1,5 +1,4 @@
 // Configuration File
-// When you deploy your backend to Render, replace this with your live backend URL
-// Example: const API_BASE_URL = 'https://cosnurses-api.onrender.com';
-
-const API_BASE_URL = 'https://jobs-go-abroad.onrender.com';
+// The frontend and backend are now served from the same domain
+// so we can use an empty string for relative paths or window.location.origin.
+const API_BASE_URL = '';

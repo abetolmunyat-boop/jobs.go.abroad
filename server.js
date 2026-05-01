@@ -24,9 +24,36 @@ app.use('/api/register', require('./routes/register'));
 app.use('/api/track',    require('./routes/track'));
 app.use('/api/admin',    require('./routes/admin'));
 
+// Serve frontend static files
+const staticFiles = [
+  'index.html', 'admin.html',
+  'style.css', 'admin.css',
+  'script.js', 'admin.js', 'config.js'
+];
+
+staticFiles.forEach(file => {
+  app.get(`/${file}`, (req, res) => {
+    res.sendFile(path.join(__dirname, file));
+  });
+});
+
+// Serve main frontend pages
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 // 404 handler for unknown API routes
-app.use((req, res) => {
+app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'API endpoint not found' });
+});
+
+// Redirect any other unknown routes to index.html
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 // Connect MongoDB then start server
 mongoose.connect(process.env.MONGO_URI)
